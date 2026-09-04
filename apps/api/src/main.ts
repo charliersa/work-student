@@ -1,7 +1,11 @@
 import 'reflect-metadata';
+import * as fs from 'node:fs';
 import * as net from 'node:net';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { env } from './config/env';
@@ -50,6 +54,31 @@ async function assertPortFree(port: number): Promise<void> {
   );
 }
 
+/**
+ * 找出已建置的前端。依序試：明確指定的 WEB_DIST_DIR → 容器內的 public/ → monorepo 的 apps/web/dist。
+ * 找不到就回傳 null，API 仍可單獨運作（例如前端另外部署到 CDN 的情況）。
+ */
+function resolveWebDir(): string | null {
+  const candidates = [
+    env.webDistDir,
+    path.resolve(__dirname, '../public'), // Docker：前端建置產物複製到 apps/api/public
+    path.resolve(__dirname, '../../web/dist'), // monorepo：apps/web/dist
+  ].filter(Boolean);
+
+  for (const dir of candidates) {
+    if (fs.existsSync(path.join(dir, 'index.html'))) return dir;
+  }
+  return null;
+}
+
+/** 這台機器上可供區網其他電腦連入的 IPv4 位址（裝在老師電腦時，學生要連的就是這個） */
+function lanAddresses(): string[] {
+  return Object.values(os.networkInterfaces())
+    .flatMap((ifaces) => ifaces ?? [])
+    .filter((i) => i.family === 'IPv4' && !i.internal)
+    .map((i) => i.address);
+}
+
 async function bootstrap() {
   const logger = new Logger('bootstrap');
 
@@ -58,7 +87,7 @@ async function bootstrap() {
   const ran = await runMigrations();
   if (ran.length) logger.log(`已套用 migration：${ran.join(', ')}`);
 
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     // 檔案位元組走 presigned URL 直傳，API 本身不需要吃大 body
     bodyParser: true,
   });
@@ -70,9 +99,45 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   });
 
+  let webDir: string | null = null;
+  if (env.serveWeb) {
+    webDir = resolveWebDir();
+    if (webDir) {
+      // index: false —— 首頁一律走下面的 SPA fallback，避免 index.html 被瀏覽器長時間快取
+      app.useStaticAssets(webDir, { index: false, maxAge: '1y', immutable: true });
+
+      // SPA fallback：直接輸入 /courses/1 或按重新整理時，仍要回傳 index.html 讓前端路由接手。
+      // 這段 middleware 會排在 Nest router 之前，所以必須自己把 /api 與帶副檔名的請求放行。
+      const indexHtml = path.join(webDir, 'index.html');
+      app.use((req: any, res: any, next: () => void) => {
+        if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+        if (req.path.startsWith('/api')) return next();
+        if (path.extname(req.path)) return next(); // 靜態資源沒命中就讓它照常 404
+        res.setHeader('Cache-Control', 'no-cache');
+        res.sendFile(indexHtml);
+      });
+    } else {
+      logger.warn('SERVE_WEB 已開啟，但找不到前端建置產物，只會提供 API');
+    }
+  }
+
   await app.listen(env.port);
   logger.log(`API 已啟動：http://localhost:${env.port}/api/health`);
   logger.log(`資料庫 driver=${env.dbDriver}，儲存 driver=${env.storageDriver}`);
+  logger.log(webDir ? `前端由 API 托管：${webDir}` : '前端未由 API 托管（開發時走 vite dev server）');
+  logger.log(
+    env.cookieSecure
+      ? '登入 cookie：Secure（只能走 HTTPS；若用純 HTTP 連線會登不進去，請設 COOKIE_SECURE=false）'
+      : '登入 cookie：非 Secure（可走純 HTTP；僅適用於校內區網等封閉環境）',
+  );
+
+  // 裝在老師電腦上時，老師要把這個網址給學生 —— 直接印出來，免得還得自己查 ipconfig
+  if (webDir) {
+    const urls = lanAddresses().map((ip) => `http://${ip}:${env.port}`);
+    logger.log(`本機開啟：http://localhost:${env.port}`);
+    if (urls.length) logger.log(`同一個區網的學生請連：${urls.join('　或　')}`);
+    else logger.warn('偵測不到區網 IP，其他電腦可能連不進來（請確認網路連線）');
+  }
 }
 
 bootstrap().catch((err) => {

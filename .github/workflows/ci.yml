@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 這個 workflow 只讀原始碼，不部署任何東西，所以權限給到最小。
+#
+# 補充：先前 GitHub Pages 的部署之所以失敗（Failed to get ID Token），
+# 是因為 deploy-pages 需要 `id-token: write`。但這個專案有 NestJS 後端與資料庫，
+# Pages 只能代管靜態檔案、跑不了 Node，所以不走那條路 —— 改成在這裡跑測試，
+# 實際部署則是在校內的老師電腦上執行（詳見 README「部署到老師電腦」）。
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: production
+      COOKIE_SECURE: 'false'
+      JWT_SECRET: ci-only-secret-not-used-anywhere-else
+      PORT: '3000'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # NODE_ENV=production 會讓 npm 跳過 devDependencies，但建置需要 TypeScript，
+      # 所以這一步明確覆寫成 development。
+      - name: 安裝相依套件
+        run: npm ci
+        env:
+          NODE_ENV: development
+
+      - name: 型別檢查
+        run: npm run typecheck
+
+      - name: 建置
+        run: npm run build
+
+      - name: 建立資料庫與種子資料
+        run: npm run db:migrate && npm run db:seed
+
+      - name: 啟動 API
+        run: |
+          nohup npm start > /tmp/api.log 2>&1 &
+          echo $! > /tmp/api.pid
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3000/api/health > /dev/null; then
+              echo "API 已就緒（${i}s）"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::API 在 60 秒內沒有起來"
+          cat /tmp/api.log
+          exit 1
+
+      - name: 端對端測試（57 項斷言）
+        run: npm run test:e2e
+        env:
+          BASE: http://localhost:3000
+
+      - name: 測試失敗時印出 API 日誌
+        if: failure()
+        run: cat /tmp/api.log || true
+
+      - name: 關閉 API
+        if: always()
+        run: kill "$(cat /tmp/api.pid)" 2>/dev/null || true

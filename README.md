@@ -108,6 +108,9 @@ work_student/
 │     ├─ submissions/      繳交流程與檔案驗證（系統核心）
 │     └─ db/               drizzle schema、migration runner、seed
 ├─ apps/web/               React + Vite + TanStack Query
+├─ .github/workflows/ci.yml  推送時自動跑型別檢查、建置與 57 項端對端測試
+├─ 啟動伺服器.bat          老師電腦上雙擊即可啟動（見「部署到老師電腦」）
+├─ .env.production.example 老師電腦用的設定範本
 ├─ docker-compose.yml      正式/團隊環境的 Postgres + MinIO
 ├─ index.html / support.js 原本的 UI 設計稿（保留作視覺參考，未被程式使用）
 └─ .env                    環境設定
@@ -115,7 +118,80 @@ work_student/
 
 ---
 
-## 換到正式環境
+## 部署到老師電腦（校內區網）
+
+這是目前建議的正式做法：整套系統跑在一台老師的電腦上，學生用校內網路連進來。
+**不需要 Docker、不需要另外安裝資料庫、不需要雲端帳號。**
+
+前端由 API 直接托管，所以只有**一個服務**要顧；前後端同源，登入 cookie 也不必處理 CORS。
+
+### 第一次安裝
+
+1. 在老師電腦安裝 [Node.js](https://nodejs.org) LTS（20 以上）
+2. 把整個專案資料夾複製過去
+3. 建立設定檔並換掉金鑰：
+
+   ```bash
+   copy .env.production.example .env
+   node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+   ```
+
+   把產生的字串填進 `.env` 的 `JWT_SECRET`。
+
+4. 雙擊 **`啟動伺服器.bat`**
+
+   第一次會自動安裝套件、建置、建立資料庫與範例帳號，需要幾分鐘。
+   之後每次只要雙擊同一個檔案即可。
+
+啟動後畫面會直接印出學生要連的網址：
+
+```
+本機開啟：http://localhost:3000
+同一個區網的學生請連：http://192.168.1.50:3000
+```
+
+### Windows 防火牆
+
+第一次啟動時 Windows 會跳出詢問，**要勾選「私人網路」並允許**。
+如果當時按了取消，之後可用系統管理員身分執行：
+
+```powershell
+New-NetFirewallRule -DisplayName "作業繳交系統" -Direction Inbound -LocalPort 3000 -Protocol TCP -Action Allow -Profile Private
+```
+
+### 兩個一定要注意的設定
+
+**`COOKIE_SECURE=false`** —— 校內用純 HTTP（`http://192.168.x.x:3000`）連線時必須是 false。
+設成 true 的話瀏覽器會**靜默丟棄**登入 cookie，症狀是「登入好像成功了，但下一頁又變回未登入」，
+沒有任何錯誤訊息，非常難查。只有真的架了 HTTPS 才改成 true。
+
+**`API_PUBLIC_URL` 不要設。** 留空時系統簽發的是相對路徑的上傳/下載網址，
+學生從任何 IP 進來都能用。設成固定網址反而會在 IP 變動時整個壞掉
+（而且如果誤填 `localhost`，學生的瀏覽器會把檔案上傳到他自己的電腦）。
+
+### 備份
+
+要備份的只有兩個資料夾，關掉伺服器後直接複製即可：
+
+| 資料夾 | 內容 |
+|---|---|
+| `apps/api/.data` | 資料庫（帳號、課程、作業、繳交紀錄） |
+| `apps/api/.storage` | 學生上傳的檔案本體 |
+
+建議每天或每次收作業後複製一份到隨身碟或學校網路磁碟。
+
+### 幾個現實面的限制
+
+- **電腦關機或睡眠時學生就交不了作業。** 收作業期間請設定不要自動睡眠。
+- **IP 可能會變。** 學校 DHCP 重新配發時網址會改。可以請網管配一個固定 IP，
+  或每次啟動時看畫面印出的網址。
+- **只能在校內連。** 學生在家沒辦法連進來。若有需要，再考慮 Cloudflare Tunnel
+  或請網管開對外連線 —— 但那時就應該一併架 HTTPS 並把 `COOKIE_SECURE` 改回 true。
+- **走純 HTTP，密碼在區網中未加密。** 封閉的校內網路可接受，對外開放前務必先上 HTTPS。
+
+---
+
+## 換到正式環境（雲端 / 多人規模）
 
 只改 `.env`，程式碼一行都不用動：
 

@@ -14,6 +14,11 @@ function num(key: string, fallback: number): number {
   const v = process.env[key];
   return v === undefined || v === '' ? fallback : Number(v);
 }
+function bool(key: string, fallback: boolean): boolean {
+  const v = process.env[key];
+  if (v === undefined || v === '') return fallback;
+  return ['1', 'true', 'yes', 'on'].includes(v.toLowerCase());
+}
 
 const port = num('PORT', 3000);
 
@@ -25,6 +30,25 @@ export const env = {
   webOrigin: str('WEB_ORIGIN', 'http://localhost:5173'),
   // 預設跟著 PORT 走：只改 PORT 時，簽發出去的上傳/下載網址不會還指著 3000
   apiPublicUrl: str('API_PUBLIC_URL', `http://localhost:${port}`),
+  /**
+   * 使用者是否「明確」設定了 API_PUBLIC_URL。
+   * 沒設定時，本機儲存驅動會簽發「相對路徑」的上傳/下載網址 —— 前端與 API 同源，
+   * 相對路徑在任何主機名稱下都成立。這樣裝在老師電腦上時，學生從 192.168.x.x 連進來
+   * 也不會被導回 localhost（那會變成 PUT 到學生自己的電腦）。
+   */
+  apiPublicUrlExplicit: !!process.env.API_PUBLIC_URL,
+
+  /**
+   * cookie 是否加上 Secure 旗標。加了就只能走 HTTPS。
+   * 校內區網用純 HTTP 直連老師電腦時必須關掉，否則瀏覽器會靜默丟棄登入 cookie ——
+   * 症狀是「登入看起來成功，但下一頁就變成未登入」，極難查。
+   */
+  cookieSecure: bool('COOKIE_SECURE', (process.env.NODE_ENV ?? 'development') === 'production'),
+
+  // 正式環境由 API 自己托管前端靜態檔：前後端同源，httpOnly cookie 不必處理 CORS，
+  // 而且只有一個服務要部署。開發時走 vite dev server，所以預設只在 production 開啟。
+  serveWeb: bool('SERVE_WEB', (process.env.NODE_ENV ?? 'development') === 'production'),
+  webDistDir: process.env.WEB_DIST_DIR ?? '', // 留空則自動尋找
 
   dbDriver: str('DB_DRIVER', 'pglite') as 'pglite' | 'pg',
   pgliteDataDir: str('PGLITE_DATA_DIR', './.data/pg'),

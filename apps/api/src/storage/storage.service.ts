@@ -68,6 +68,16 @@ export abstract class StorageDriver {
  * 以簽章 token 模擬 S3 presigned URL，流程與正式環境完全一致，
  * 之後把 STORAGE_DRIVER 換成 s3 即可，上層程式碼一行都不用改。
  * ------------------------------------------------------------------ */
+/**
+ * 本機儲存驅動簽發網址時用的前綴。
+ * 沒有明確設定 API_PUBLIC_URL 就回傳空字串，也就是簽發「相對路徑」——
+ * 前端由 API 同源托管，相對路徑在 localhost、192.168.x.x、自訂網域下都成立，
+ * 不必為了換一個網址就去改設定。
+ */
+function localUrlBase(): string {
+  return env.apiPublicUrlExplicit ? env.apiPublicUrl : '';
+}
+
 @Injectable()
 export class LocalDiskStorage extends StorageDriver {
   private readonly root = path.resolve(process.cwd(), env.localStorageDir);
@@ -94,7 +104,7 @@ export class LocalDiskStorage extends StorageDriver {
     };
     const token = await signToken(claims, env.uploadUrlTtl);
     return {
-      uploadUrl: `${env.apiPublicUrl}/api/storage/upload?token=${encodeURIComponent(token)}`,
+      uploadUrl: `${localUrlBase()}/api/storage/upload?token=${encodeURIComponent(token)}`,
       method: 'PUT',
       storageKey: input.storageKey,
       uploadToken: token,
@@ -114,7 +124,7 @@ export class LocalDiskStorage extends StorageDriver {
       mimeType: input.mimeType,
     };
     const token = await signToken(claims, env.downloadUrlTtl);
-    return `${env.apiPublicUrl}/api/storage/download?token=${encodeURIComponent(token)}`;
+    return `${localUrlBase()}/api/storage/download?token=${encodeURIComponent(token)}`;
   }
 
   /** 由 storage.controller 的 PUT 端點呼叫 */

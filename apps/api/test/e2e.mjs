@@ -86,8 +86,13 @@ const PNG = Buffer.from(
   '89504e470d0a1a0a0000000d4948445200000001000000010806000000' +
   '1f15c4890000000a49444154789c6300010000050001', 'hex');
 
+/** 本機儲存驅動簽發的是相對路徑，補上 BASE 才能用 Node 的 fetch 打 */
+function absolute(url) {
+  return url.startsWith('http') ? url : BASE + url;
+}
+
 async function uploadTo(ticket, bytes) {
-  return fetch(ticket.uploadUrl, { method: 'PUT', body: bytes });
+  return fetch(absolute(ticket.uploadUrl), { method: 'PUT', body: bytes });
 }
 
 const log = [];
@@ -274,7 +279,7 @@ try {
   /* ---------- 11. 下載 ---------- */
   const dl = await teacher.get(`/api/files/${fileId}/download-url`);
   ok('教師取得下載連結', dl.status === 200 && !!dl.data.url, JSON.stringify(dl.data));
-  const fileRes = await fetch(dl.data.url);
+  const fileRes = await fetch(absolute(dl.data.url));
   const cd = fileRes.headers.get('content-disposition') || '';
   const body = Buffer.from(await fileRes.arrayBuffer());
   ok('下載檔案位元組正確', body.equals(PDF), `${body.length} vs ${PDF.length}`);

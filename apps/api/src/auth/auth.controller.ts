@@ -12,7 +12,7 @@ function cookieOpts(maxAgeSeconds: number): CookieOptions {
   return {
     httpOnly: true, // JS 讀不到 → XSS 也偷不走 token
     sameSite: 'lax',
-    secure: env.isProd,
+    secure: env.cookieSecure,
     path: '/',
     maxAge: maxAgeSeconds * 1000,
   };

@@ -16,7 +16,8 @@
     "db:seed": "npm run db:seed -w @ws/api",
     "db:reset": "npm run db:reset -w @ws/api",
     "typecheck": "npm run typecheck -w @ws/shared && npm run typecheck -w @ws/api && npm run typecheck -w @ws/web",
-    "test:e2e": "npm run test:e2e -w @ws/api"
+    "test:e2e": "npm run test:e2e -w @ws/api",
+    "start": "npm run start -w @ws/api"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
