@@ -1,0 +1,14 @@
+# 統一以 LF 存進 repo，避免在 Windows / macOS / Linux 之間換手時整包檔案顯示為已修改。
+# Windows 上 checkout 仍會依 core.autocrlf 還原成 CRLF，編輯體驗不受影響。
+* text=auto eol=lf
+
+# 這些一律當二進位，不要做任何行尾轉換
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.woff binary
+*.woff2 binary

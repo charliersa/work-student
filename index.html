@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f4f1ea; font-family: "Noto Sans TC", sans-serif; color: #1b1a17; }
+  a { color: #1b5e4b; text-decoration: none; }
+  a:hover { color: #0f3a2e; text-decoration: underline; }
+</style>
+</helmet>
+<div style="min-height:100vh; display:flex; flex-direction:column;">
+
+  <div style="background:#1b1a17; color:#cfc9bb; font-size:12px; padding:7px 0;">
+    <div style="max-width:1120px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+      <span>國立新營高級工業職業學校</span>
+      <span style="display:flex; gap:18px;">
+        <a href="#" style="color:#cfc9bb;">校園公告</a>
+        <a href="#" style="color:#cfc9bb;">行事曆</a>
+      </span>
+    </div>
+  </div>
+
+  <header style="background:#1b5e4b; color:#f4f1ea;">
+    <div style="max-width:1120px; margin:0 auto; padding:18px 24px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+      <span style="width:46px; height:46px; flex:none; border:2px solid #f4f1ea; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:900;">營</span>
+      <span style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:180px;">
+        <span style="font-size:19px; font-weight:900; letter-spacing:.02em;">學生學習平台</span>
+        <span style="font-size:12px; opacity:.8;">Student Learning Portal</span>
+      </span>
+      <nav style="display:flex; gap:22px; font-size:14px; font-weight:500;">
+        <a href="#" style="color:#f4f1ea; opacity:.85;">課程</a>
+        <a href="#" style="color:#f4f1ea; border-bottom:2px solid #f4f1ea; padding-bottom:2px;">作業繳交</a>
+        <a href="#" style="color:#f4f1ea; opacity:.85;">成績查詢</a>
+        <a href="#" style="color:#f4f1ea; opacity:.85;">個人資料</a>
+      </nav>
+      <span style="display:flex; align-items:center; gap:9px; font-size:13px; padding-left:8px; border-left:1px solid rgba(244,241,234,.35);">
+        <span style="width:30px; height:30px; border-radius:50%; background:#f4f1ea; color:#1b5e4b; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">—</span>
+        <span style="opacity:.75;">未登入</span>
+      </span>
+    </div>
+  </header>
+
+  <div style="max-width:1120px; width:100%; margin:0 auto; padding:14px 24px; font-size:12px; color:#6b675c;">首頁　/　學生學習平台　/　<span style="color:#1b1a17; font-weight:500;">作業繳交</span></div>
+
+  <main style="max-width:1120px; width:100%; margin:0 auto; padding:8px 24px 72px; display:grid; grid-template-columns:300px 1fr; gap:24px; align-items:start;">
+
+    <aside style="background:#fff; border:1px solid #ded8c9; display:flex; flex-direction:column;">
+      <div style="padding:16px 18px; border-bottom:1px solid #e7e1d2; display:flex; justify-content:space-between; align-items:baseline;">
+        <span style="font-size:15px; font-weight:700;">我的作業</span>
+        <span style="font-size:12px; color:#8b8578; white-space:nowrap;">—</span>
+      </div>
+      <div style="padding:40px 18px; text-align:center; font-size:13px; color:#8b8578; line-height:1.8;">
+        目前沒有作業項目
+      </div>
+    </aside>
+
+    <div style="display:flex; flex-direction:column; gap:20px; min-width:0;">
+
+      <section style="background:#fff; border:1px solid #ded8c9; padding:24px; display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;">
+          <span style="font-size:12px; font-weight:700; letter-spacing:.14em; background:#1b5e4b; color:#f4f1ea; padding:4px 9px; white-space:nowrap;">科目</span>
+          <span style="font-size:12px; font-weight:700; padding:3px 9px; white-space:nowrap; flex:none; color:#8b8578; border:1px solid #ded8c9;">未繳交</span>
+        </div>
+        <h1 style="margin:0; font-size:28px; font-weight:900; letter-spacing:-.01em; line-height:1.3; color:#b3ada0;">作業標題</h1>
+        <p style="margin:0; font-size:14px; line-height:1.9; color:#8b8578; max-width:60ch; text-wrap:pretty;">作業說明</p>
+        <div style="display:flex; gap:24px; flex-wrap:wrap; font-size:13px; color:#8b8578; border-top:1px solid #e7e1d2; margin-top:4px; padding-top:14px;">
+          <span>截止　<strong style="color:#8b8578;">—</strong></span>
+          <span>剩餘　<strong style="color:#8b8578;">—</strong></span>
+          <span>格式　<strong style="color:#8b8578;">—</strong></span>
+        </div>
+      </section>
+
+      <section style="background:#fff; border:1px solid #ded8c9; padding:24px; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <h2 style="margin:0; font-size:16px; font-weight:700;">步驟 1　下載作業檔案</h2>
+          <span style="font-size:12px; color:#8b8578; white-space:nowrap;">共 0 個檔案</span>
+        </div>
+        <div style="padding:36px 20px; text-align:center; background:#faf8f2; border:1px solid #e7e1d2; font-size:13px; color:#8b8578;">
+          尚無可下載的檔案
+        </div>
+      </section>
+
+      <section style="background:#fff; border:1px solid #ded8c9; padding:24px; display:flex; flex-direction:column; gap:14px;">
+        <h2 style="margin:0; font-size:16px; font-weight:700;">步驟 2　上傳我的作業</h2>
+
+        <label onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onDrop }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:44px 20px; border:2px dashed {{ dropBorder }}; background:{{ dropBg }}; cursor:pointer; text-align:center; transition:background .15s, border-color .15s;">
+          <input type="file" multiple="{{ true }}" onChange="{{ onPick }}" style="display:none;" />
+          <span style="font-size:16px; font-weight:700;">把檔案拖到這裡，或點擊選擇檔案</span>
+          <span style="font-size:13px; color:#6b675c;">可一次選擇多個檔案；同名檔案會取代舊版本</span>
+        </label>
+
+        <sc-if value="{{ hasFiles }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ files }}" as="f" hint-placeholder-count="1">
+              <div style="display:flex; align-items:center; gap:14px; padding:12px 16px; background:#faf8f2; border:1px solid #e7e1d2;">
+                <span style="flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;">
+                  <span style="display:flex; gap:8px; align-items:baseline;">
+                    <span style="font-size:14px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.name }}</span>
+                    <span style="font-size:12px; color:#6b675c; flex:none;">{{ f.size }}</span>
+                  </span>
+                  <span style="height:4px; background:#e7e1d2; overflow:hidden;">
+                    <span style="display:block; height:100%; width:{{ f.pct }}; background:{{ f.barColor }}; transition:width .25s;"></span>
+                  </span>
+                </span>
+                <span style="flex:none; font-size:12px; font-weight:700; color:{{ f.barColor }}; width:60px; text-align:right;">{{ f.stateLabel }}</span>
+                <button onClick="{{ f.remove }}" title="移除" style="flex:none; width:28px; height:28px; font-family:inherit; font-size:15px; line-height:1; color:#6b675c; background:transparent; border:1px solid #ded8c9; cursor:pointer;" style-hover="color:#b4451f; border-color:#b4451f;">×</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding-top:2px;">
+          <button onClick="{{ submit }}" disabled="{{ submitDisabled }}" style="padding:13px 30px; font-family:inherit; font-size:15px; font-weight:700; color:#f4f1ea; background:{{ submitBg }}; border:none; cursor:{{ submitCursor }};">{{ submitLabel }}</button>
+          <span style="font-size:13px; color:#6b675c;">{{ hint }}</span>
+        </div>
+      </section>
+
+      <sc-if value="{{ hasHistory }}" hint-placeholder-val="{{ false }}">
+        <section style="background:#fff; border:1px solid #ded8c9; padding:24px; display:flex; flex-direction:column; gap:10px;">
+          <h2 style="margin:0; font-size:16px; font-weight:700;">繳交紀錄</h2>
+          <sc-for list="{{ history }}" as="h" hint-placeholder-count="1">
+            <div style="display:flex; gap:16px; align-items:baseline; padding:12px 0; border-top:1px solid #e7e1d2; font-size:14px;">
+              <span style="flex:none; width:120px; color:#6b675c; font-size:13px;">{{ h.time }}</span>
+              <span style="flex:1; min-width:0;">{{ h.names }}</span>
+              <span style="flex:none; font-size:12px; font-weight:700; color:#1b5e4b;">{{ h.tag }}</span>
+            </div>
+          </sc-for>
+        </section>
+      </sc-if>
+    </div>
+  </main>
+
+  <footer style="margin-top:auto; background:#1b1a17; color:#a9a49a; font-size:12px; padding:24px 0;">
+    <div style="max-width:1120px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; line-height:1.8;">
+      <span>國立新營高級工業職業學校　教務處資訊組<br />臺南市新營區長榮路一段 76 號</span>
+      <span>本頁為原型示範，檔案不會真正上傳至伺服器。</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const fmt = b => b < 1024 ? b + " B" : b < 1048576 ? (b/1024).toFixed(0) + " KB" : (b/1048576).toFixed(1) + " MB";
+const pad = n => String(n).padStart(2, "0");
+const stamp = d => `${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+class Component extends DCLogic {
+  state = { files: [], history: [], dragging: false, uploading: false };
+
+  addFiles(list) {
+    const incoming = Array.from(list).map(f => ({ id: Math.random().toString(36).slice(2), name: f.name, bytes: f.size, progress: 0 }));
+    this.setState(s => ({ files: [...s.files.filter(f => !incoming.some(i => i.name === f.name)), ...incoming] }));
+  }
+
+  submit() {
+    if (!this.state.files.length || this.state.uploading) return;
+    this.setState({ uploading: true });
+    const tick = setInterval(() => {
+      this.setState(s => {
+        const files = s.files.map(f => ({ ...f, progress: Math.min(100, f.progress + 8 + Math.random() * 14) }));
+        if (files.every(f => f.progress >= 100)) {
+          clearInterval(tick);
+          return { files, uploading: false,
+            history: [{ time: stamp(new Date()), names: files.map(f => f.name).join("、"), tag: s.history.length ? "重新繳交" : "已繳交" }, ...s.history] };
+        }
+        return { files };
+      });
+    }, 180);
+  }
+
+  renderVals() {
+    const { files, history, uploading, dragging } = this.state;
+    return {
+      files: files.map(f => ({
+        name: f.name, size: fmt(f.bytes), pct: f.progress + "%",
+        barColor: f.progress >= 100 ? "#1b5e4b" : "#b4451f",
+        stateLabel: f.progress >= 100 ? "完成" : f.progress > 0 ? Math.round(f.progress) + "%" : "待上傳",
+        remove: () => this.setState(s => ({ files: s.files.filter(x => x.id !== f.id) }))
+      })),
+      hasFiles: files.length > 0,
+      history, hasHistory: history.length > 0,
+      dropBorder: dragging ? "#1b5e4b" : "#ded8c9",
+      dropBg: dragging ? "#eef4f0" : "#faf8f2",
+      submitLabel: uploading ? "上傳中…" : history.length ? "重新繳交" : "確認繳交",
+      submitDisabled: !files.length || uploading,
+      submitBg: !files.length || uploading ? "#b3ada0" : "#1b1a17",
+      submitCursor: !files.length || uploading ? "not-allowed" : "pointer",
+      hint: files.length ? `已選擇 ${files.length} 個檔案` : "請先選擇要繳交的檔案",
+      onPick: e => { this.addFiles(e.target.files); e.target.value = ""; },
+      onDragOver: e => { e.preventDefault(); if (!dragging) this.setState({ dragging: true }); },
+      onDragLeave: () => this.setState({ dragging: false }),
+      onDrop: e => { e.preventDefault(); this.setState({ dragging: false }); this.addFiles(e.dataTransfer.files); },
+      submit: () => this.submit()
+    };
+  }
+}
+</script>
+</body>
+</html>
