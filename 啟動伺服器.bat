@@ -64,6 +64,10 @@ if not exist "apps\api\.data" (
     if errorlevel 1 goto failed
 )
 
+REM 沒設定防火牆的話，學生會連不進來而且完全沒有提示訊息，所以先檢查一下
+powershell -NoProfile -Command ^
+  "if (-not (Get-NetFirewallRule -DisplayName '學生作業繳交系統' -ErrorAction SilentlyContinue)) { Write-Host ''; Write-Host '[注意] 尚未設定防火牆，學生電腦可能連不進來。' -ForegroundColor Yellow; Write-Host '       請先關掉這個視窗，用滑鼠右鍵以系統管理員身分執行「允許學生連線.bat」。' -ForegroundColor Yellow; Write-Host '       （若只是自己在這台電腦上測試，可以忽略這則訊息。）' -ForegroundColor Yellow; Write-Host '' }" 2> nul
+
 echo.
 echo ============================================================
 echo   啟動中... 學生要連的網址會顯示在下面

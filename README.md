@@ -110,6 +110,7 @@ work_student/
 ├─ apps/web/               React + Vite + TanStack Query
 ├─ .github/workflows/ci.yml  推送時自動跑型別檢查、建置與 57 項端對端測試
 ├─ 啟動伺服器.bat          老師電腦上雙擊即可啟動（見「部署到老師電腦」）
+├─ 允許學生連線.bat        防火牆設定，第一次以系統管理員身分執行一次
 ├─ .env.production.example 老師電腦用的設定範本
 ├─ docker-compose.yml      正式/團隊環境的 Postgres + MinIO
 ├─ index.html / support.js 原本的 UI 設計稿（保留作視覺參考，未被程式使用）
@@ -138,7 +139,8 @@ work_student/
 
    把產生的字串填進 `.env` 的 `JWT_SECRET`。
 
-4. 雙擊 **`啟動伺服器.bat`**
+4. 用滑鼠右鍵，**以系統管理員身分執行 `允許學生連線.bat`**（只要做一次）
+5. 雙擊 **`啟動伺服器.bat`**
 
    第一次會自動安裝套件、建置、建立資料庫與範例帳號，需要幾分鐘。
    之後每次只要雙擊同一個檔案即可。
@@ -150,14 +152,16 @@ work_student/
 同一個區網的學生請連：http://192.168.1.50:3000
 ```
 
-### Windows 防火牆
+### Windows 防火牆（學生連不進來時就是這裡）
 
-第一次啟動時 Windows 會跳出詢問，**要勾選「私人網路」並允許**。
-如果當時按了取消，之後可用系統管理員身分執行：
+**用滑鼠右鍵，以系統管理員身分執行 `允許學生連線.bat`** —— 只要做一次。
 
-```powershell
-New-NetFirewallRule -DisplayName "作業繳交系統" -Direction Inbound -LocalPort 3000 -Protocol TCP -Action Allow -Profile Private
-```
+它會依 `.env` 裡的 `PORT` 開放校內網路的入站連線，並且順便清掉「封鎖 Node.js」的
+舊規則。那種規則通常是之前 Windows 跳出詢問時按了「取消」留下的，症狀是學生一直連不上，
+但伺服器這邊完全沒有任何錯誤訊息 —— 因為封包在進到程式之前就被丟掉了。
+
+規則只開放「私人網路」與「網域」，不開放公用網路。
+`啟動伺服器.bat` 每次啟動也會檢查，沒設定就會提醒。
 
 ### 兩個一定要注意的設定
 
