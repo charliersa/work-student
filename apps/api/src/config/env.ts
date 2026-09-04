@@ -71,6 +71,24 @@ export const env = {
   downloadUrlTtl: num('DOWNLOAD_URL_TTL', 300),
 };
 
-if (env.isProd && env.jwtSecret.startsWith('dev-only-secret')) {
-  throw new Error('正式環境必須設定自己的 JWT_SECRET');
+/**
+ * 正式環境不接受範本裡的佔位字串或過短的金鑰 —— 金鑰太弱等於任何人都能偽造登入憑證，
+ * 而且這種問題不會有任何徵兆，只能在啟動時就攔下來。
+ *
+ * 刻意做成函式而不是在模組載入時直接 throw：在模組載入階段拋出的例外會繞過
+ * main.ts 的錯誤處理，變成一大串 stack trace，對負責安裝的老師來說毫無幫助。
+ * 由 bootstrap 呼叫，才能印出乾淨的一行說明。
+ */
+export function validateEnv(): void {
+  if (!env.isProd) return;
+
+  const genHint = '產生方式：\n  node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"';
+  const placeholders = ['dev-only-secret', '請換掉這一行', 'changeme', 'change-me'];
+
+  if (placeholders.some((p) => env.jwtSecret.includes(p))) {
+    throw new Error(`JWT_SECRET 還是設定範本裡的預設值，請打開 .env 換成自己的。\n${genHint}`);
+  }
+  if (env.jwtSecret.length < 32) {
+    throw new Error(`JWT_SECRET 太短（目前 ${env.jwtSecret.length} 字元），至少要 32 字元。\n${genHint}`);
+  }
 }

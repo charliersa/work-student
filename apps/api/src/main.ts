@@ -8,7 +8,7 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { env } from './config/env';
+import { env, validateEnv } from './config/env';
 import { runMigrations } from './db/migrate';
 
 /** 對單一位址試連，連得上代表已經有人在聽 */
@@ -82,6 +82,7 @@ function lanAddresses(): string[] {
 async function bootstrap() {
   const logger = new Logger('bootstrap');
 
+  validateEnv();
   await assertPortFree(env.port);
 
   const ran = await runMigrations();
